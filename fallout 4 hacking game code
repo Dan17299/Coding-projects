@@ -1,0 +1,62 @@
+def best_guess(w):
+    w = w.split(', ')
+    l = len(w[0])
+    def most_common(x):
+        c = [x.count(i) for i in x]
+        m = max(c)
+        return x[c.index(m)]
+    s = []
+    f = []
+    for i in range(0, l):
+        v = [x[i] for x in w]
+        s.append(most_common(v))
+        f.append(v.count(most_common(v)))
+    def word_score(x):
+        t = 0
+        for i in range(0, l):
+            if x[i] == s[i]:
+                t += f[i]
+        return t
+    scores = [word_score(i) for i in w]
+    g = w[scores.index(max(scores))]
+    return w, g
+
+words1 = input('What are the password options?')
+words1, g1 = best_guess(words1)
+print(f'The best first guess is {g1}')
+likeliness1 = int(input('What is the likeliness?'))
+if likeliness1 == len(words1[0]):
+    print(f'The password was found to be {g1} after 1 guess, have a nice day!')
+    exit()
+def num_char_match(x, y):
+    s = 0
+    for i in range(0, len(x)):
+        if x[i] == y[i]:
+            s += 1
+    return s
+def char_match(x, y):
+    s = ''
+    for i in range(0, len(x)):
+        if x[i] == y[i]:
+            s += x[i]
+    return s
+def shorten(x, y):
+    for i in y:
+        x = x.replace(i, '', 1)
+    return x
+g = g1
+likeliness = likeliness1
+words = words1
+index = ['second', 'third', 'final']
+for i in range(0, 3):
+    words = [i for i in words if num_char_match(i, g) == likeliness]
+    shortened_words = [shorten(i, char_match(i, g)) for i in words]
+    shortened_words, g = best_guess(', '.join(shortened_words))
+    g = words[shortened_words.index(g)]
+    print(f'The best {index[i]} guess is {g}')
+    likeliness = int(input('What is the likeliness?'))
+    if likeliness == len(words[0]):
+        print(f'The password was found to be {g} in {i + 2} guesses, have a nice day!')
+        break
+    if i == 4 and likeliness < len(words[0]):
+        print('Sorry I can not guess the password')
