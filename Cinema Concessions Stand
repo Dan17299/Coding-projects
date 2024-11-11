@@ -1,0 +1,30 @@
+menu = {"pizza": 3.00,
+        "nachos": 4.50,
+        "popcorn": 6.00,
+        "fries": 2.50,
+        "chips": 1.00,
+        "pretzel": 3.50,
+       "soda": 3.00,
+       "lemonade": 4.25}
+
+print("Menu\n--------------------")
+for key, value in menu.items():
+    print(f"{key}: {value:.2f}")
+
+snacks = []
+total = 0
+
+
+while True:
+    snack = input("What would you like?: (press q to quit)").lower()
+    if snack == "q":
+        break
+    while not snack in menu.keys():
+        snack = input(f"{snack.capitalize()} is not an option, please select another").lower()
+    snacks.append(snack.capitalize())
+    total += menu.get(snack)
+
+print("Receipt\n-------")
+for snack in snacks:
+    print(f"{snack} --- ${menu.get(snack.lower()):.2f}")
+print(f"\n\nYour total is: ${total:.2f}")
