@@ -1,0 +1,18 @@
+import time
+import math
+
+h, m, s = int(input("Enter the hours:")), int(input("Enter the minutes:")), int(input("Enter the seconds:"))
+while not 0 <= m:
+    print("Please enter a value for minutes in the range 0 - 60")
+    m = int(input("Enter the minutes:"))
+while not 0 <= s:
+    print("Please enter a value for seconds in the range 0 - 60")
+    m = int(input("Enter the seconds:"))
+
+total_time = 3600*h + 60*m + s
+for i in range(total_time, -1, -1):
+    print(f"Time remaning: {math.floor(i/3600):02}:{math.floor(i%3600/60):02}:{i%60:02}")
+    if i == 0:
+        print("TIME'S UP")
+        break
+    time.sleep(1)
