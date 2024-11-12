@@ -1,0 +1,50 @@
+import random
+balance = 0
+symbols = ["🍇","🍎","🍋","🍌","🍊","🍐"]
+win = "🍋"
+options = {1:"Check Balance",2:"Load Credit",3:"Spin the Wheel", 4:"Quit"}
+
+def getBalance():
+    global balance
+    print(f"Your balance is ${balance:,.2f}")
+
+def addCredit():
+    global balance
+    add = input("How much would you like to add?: $")
+    while not add.isdigit() or not 0 < float(add):
+        add = input(f"{add} is not valid, please choose again: $")
+    balance += float(add)
+    print(f"${int(add):,.2f} was added.")
+
+def spinWheel():
+    global balance
+    if balance >= 1:
+        balance -= 1
+        winning = 0 
+        for s in range(4):
+            symbol = random.choice(symbols)
+            print(f"{symbol}", end = " ")
+            if symbol == win:
+                winning += 1
+                balance += 1
+                print(f"You have won ${winning:.2f}")
+    else:
+        print("You do not have enough credit")
+
+print("**********************\n  Welcome to PySlots\n**********************")
+while True:
+    for key, value in options.items():
+        print(f"{key}. {value}")
+    playing = input("Choose an option (1-4): ")
+    while not playing.isdigit() or not 1 <= int(playing) <= 4:
+        playing = input(f"{playing} is not one of the options, please choose again: ")
+    match int(playing):
+        case 1:
+            getBalance()
+        case 2:
+            addCredit()
+        case 3:
+            spinWheel()
+        case 4:
+            print("Thanks for playing, please collect your winnings at the cash desk")
+            break
