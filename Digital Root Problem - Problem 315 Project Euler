@@ -1,0 +1,101 @@
+# create dictionary to track the lights in each digit
+digit_lights = {
+    "0": {"T", "TR", "BR", "B", "BL", "TL"},
+    "1": {"TR", "BR"},
+    "2": {"T", "TR", "M", "BL", "B"},
+    "3": {"T", "TR", "M", "BR", "B"},
+    "4": {"TL", "TR", "M", "BR"},
+    "5": {"T", "TL", "M", "BR", "B"},
+    "6": {"T", "TL", "M", "BR", "B", "BL"},
+    "7": {"TL", "T", "TR", "BR"},
+    "8": {"T", "TR", "BR", "B", "BL", "TL", "M"},
+    "9": {"T", "TR", "BR", "TL", "M", "B"},
+}
+
+# create dictionary to add letters to the start based on digit's position
+digit_position = {0:"",1:"A",2:"B",3:"C",4:"D",5:"E",6:"F",7:"G",8:"H"}
+
+# write a function to determine all the lights in a number
+def lights_number(x:int):
+    number = str(x)
+    lights = set()
+    for d in range(len(number)):
+        lights = lights | {digit_position[len(number) - 1 - d] + element for element in digit_lights[number[d]]}
+    return(lights, len(lights))
+
+# write a function to calculate the digital root
+def digital_root(x:int):
+    number = str(x)
+    s = 0
+    for digit in number:
+        s += int(digit)
+    return(s)
+
+# write a function that returns the overlap of lights between a number and its digit root
+def lights_overlap(x):
+    """
+    Returns the lights shared between x and it's digital root
+    """
+    number = lights_number(x)[0]
+    root = digital_root(x)
+    new_number = lights_number(root)[0]
+    overlap = number & new_number
+    return(overlap)
+
+# write a function to return the lights to turn off
+def turn_off(x):
+    number = lights_number(x)[0]
+    overlap = lights_overlap(x)
+    off = number - overlap
+    return(off, len(off))
+
+# write a function to return the lights to turn on
+def turn_on(x):
+    new_number = lights_number(digital_root(x))[0]
+    overlap = lights_overlap(x)
+    on = new_number - overlap
+    return(on, len(on))
+
+def transition(x):
+    s = turn_off(x)[1] + turn_on(x)[1]
+    return(s)
+
+def smart_transitions(x):
+    s = 0
+    s += lights_number(x)[1] + transition(x)
+    x = digital_root(x)
+    while x >= 10:
+        s += transition(x)
+        x = digital_root(x)
+    s += lights_number(x)[1]
+    return(s)
+
+def dumb_transitions(x):
+    s = 0 
+    s += 2 * lights_number(x)[1]
+    x = digital_root(x)
+    while x >= 10:
+        s += 2 * lights_number(x)[1]
+        x = digital_root(x)
+    s += 2 * lights_number(x)[1]
+    return(s)
+
+def difference(x):
+    return(dumb_transitions(x) - smart_transitions(x))
+
+def sieve(x):
+    p = [True] * (x+1)
+    p[0] = p[1] = False
+    for i in range(2, int(x**(1/2))+1):
+        if p[i]:
+            for j in range(i**2,x+1,i):
+                p[j] = False
+    primes = [index for index, prime in enumerate(p) if prime]
+    return(primes)
+
+s = 0
+n = [difference(x) for x in sieve(2*10**7) if x >= 10**7]
+for i in n:
+    s += i
+
+print(f"The difference between the two clocks is {s}")
