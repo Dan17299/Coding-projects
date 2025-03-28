@@ -1,0 +1,61 @@
+import json
+import pandas as pd
+
+file_name = "to_do_list.json"
+
+def view_tasks():
+    with open(file_name, "r") as file:
+        df = pd.DataFrame(json.load(file))
+        print(df)
+
+def create_tasks():
+    create_string = input("Please enter the task and the due date (enter as task, due date): ")
+    create_array = [x.strip() for x in create_string.split(",")]
+    create_tasks = [create_array[i] for i in range(len(create_array)) if i%2 == 0]
+    create_due_dates = [create_array[i] for i in range(len(create_array)) if i%2 == 1]
+    with open(file_name, "r") as file:
+        data = json.load(file)
+    keys = ["Task", "Date Due"]
+    values = [create_tasks, create_due_dates]
+    for key, value in zip(keys, values):
+        data[key].extend(value)
+    with open(file_name, "w") as file:
+        json.dump(data, file, indent = 4)
+    for i in range(len(create_tasks)):
+        print(f"You have created the task: {create_tasks[i]}, with a due date of: {create_due_dates[i]}.")
+
+def mark_complete():
+        complete = input("Which tasks would you like to mark as complete?: ")
+        complete_array = [x.strip() for x in complete.split(",")]
+        with open(file_name, "r") as file:
+            data = json.load(file)
+        keys = ["Task", "Date Due"]
+        for i in complete_array:
+            data[keys[1]].remove(data[keys[1]][data[keys[0]].index(i)])
+            data[keys[0]].remove(i)
+        for i in range(len(complete_array)):
+            print(f"You have marked the task: {complete_array[i]} as complete.")
+        with open(file_name, "w") as file:
+            json.dump(data, file, indent=4)
+
+def main():
+    while True:
+        print("Please select an option")
+        options = ["View tasks","Create tasks","Mark tasks as complete","Exit"]
+        for i in range(len(options)):
+            print(f"{i+1}. {options[i]}")
+        selected = input("Which option would you like?: ")
+        while selected not in [str(x) for x in list(range(1, len(options)+1))]:
+            selected = input(f"{selected} is not a valid option, please choose again: ")
+        if selected == "1":
+            view_tasks()
+        elif selected == "2":
+            create_tasks()
+        elif selected == "3":
+            mark_complete()
+        else:
+            print("You exited the program, have a nice day!")
+            break
+
+
+main()
