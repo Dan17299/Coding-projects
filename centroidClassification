@@ -1,0 +1,54 @@
+import numpy as np
+import pandas as pd 
+import json
+
+def centroid(df:pd.DataFrame) -> tuple:
+    """
+    Calculates the centroid for a DataFrame
+    """
+    dimensions = len(df.columns)
+    centroid = np.zeros(dimensions)
+    for i in range(dimensions):
+        centroid[i] = df[df.columns[i]].mean()
+    return tuple(centroid)
+
+class Point(tuple):
+    def __init__(self, *args):
+        super().__init__()
+
+    def distance(self, point=(0, 0)) -> float:
+        """
+        Returns the distance to a point
+        """
+        d = 0 
+        try:
+            for i in range(len(self)):
+                d += (self[i]-point[i])**2
+        except Exception as e:
+            return f"The problem is: {e}"
+        return np.sqrt(d)
+
+
+    def classify(self,file_name:str) -> tuple:
+        """
+        Classifies a point according to its distance from the centroids of each class.\n
+        Returns (Classification, Distance)
+        """
+        # load the data into a DataFrame
+        with open(file_name, "r") as file:
+            data = json.load(file)
+        df = pd.DataFrame(data)
+
+        # create a array of the DataFrames (with only training data) by class 
+        classArray = np.sort(df["Class"].unique())
+        class_dfArray = [df[df["Class"] == i].drop(["Class"], axis = 1) for i in classArray]
+
+        # create a distance_from_centroid:class dictionary
+        centroidArray = np.array([centroid(df) for df in class_dfArray])
+        distanceArray = np.array([self.distance(centroid) for centroid in centroidArray])
+        distance_centroidDict = dict(zip(distanceArray.tolist(), classArray.tolist()))
+
+        # find the minimum distance and use as the key in distance_centroidDict
+        min_distance = np.min(distanceArray)
+        classification = distance_centroidDict[min_distance]
+        return classification, min_distance
